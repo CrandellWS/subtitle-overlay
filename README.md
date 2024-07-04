@@ -20,7 +20,7 @@ Welcome to the Text to Image Generator! This tool allows you to generate images 
 
 ## Installation
 
-No installation is required. Simply open `index.html` in your web browser to start using the application.
+No installation is required. Simply open the GitHub pages url: https://crandellws.github.io/subtitle-overlay/ in your web browser to start using the application.
 
 ## Contributing
 
