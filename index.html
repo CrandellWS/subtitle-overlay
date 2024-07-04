@@ -8,42 +8,52 @@
         body, html {
             height: 100%;
             margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
         }
         #imagesContainer img {
             max-width: 100%;
             height: auto;
         }
+        #textInput {
+            min-height: 10rem;
+        }
         .bordered {
             border: 2px solid #000; /* Example: solid black border */
+        }
+        .flex-container {
+            flex-shrink: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
         }
     </style>
 </head>
 <body>
-<div id="instructionsContainer" style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9;">
-    <h2>Welcome to the Text to Image Generator!</h2>
-    <p>This tool allows you to generate images from your text. Simply enter your text, adjust the settings below, and click "Generate Images".</p>
-    <p>You can also select a custom font file (.ttf or .otf) to personalize your images further.</p>
+<div class="flex-container">
+    <div id="instructionsContainer" style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9;">
+        <h2>Welcome to the Text to Image Generator!</h2>
+        <p>This tool allows you to generate images from your text. Simply enter your text, adjust the settings below, and click "Generate Images".</p>
+        <p>You can also select a custom font file (.ttf or .otf) to personalize your images further.</p>
+    </div>
 </div>
-<textarea id="textInput" rows="10" cols="50" placeholder="Enter your text here..." title="Enter text to generate images"></textarea><br>
-<label for="canvasWidth" title="Set the width of the canvas">Canvas Width:</label>
-<input type="number" id="canvasWidth" value="1920"><br>
-<label for="canvasHeight" title="Set the height of the canvas">Canvas Height:</label>
-<input type="number" id="canvasHeight" value="200"><br>
-<label for="fontSize" title="Set the font size for the text">Font Size:</label>
-<input type="number" id="fontSize" value="48"><br>
-<label for="fontColor" title="Choose the font color">Font Color:</label>
-<input type="color" id="fontColor" value="#000000"><br>
-<label for="fontFile" title="Select a custom font file (.ttf or .otf)">Select a Font File:</label>
-<input type="file" id="fontFile" accept=".ttf,.otf"><br>
-<button onclick="generateImages()" title="Click to generate images from text">Generate Images</button><br>
-<!--<button id="downloadAllConsent" title="Download all generated images">Download All Images</button>-->
-<button id="removeAllImages" title="Remove all displayed images">Remove All Images</button>
-<button id="toggleBorder" title="Toggle border on images">Toggle Border</button>
+<div class="flex-container">
+    <textarea id="textInput" rows="10" cols="50" placeholder="Enter your text here..." title="Enter text to generate images"></textarea><br>
+    <label for="canvasWidth" title="Set the width of the canvas">Canvas Width:</label>
+    <input type="number" id="canvasWidth" value="1920"><br>
+    <label for="canvasHeight" title="Set the height of the canvas">Canvas Height:</label>
+    <input type="number" id="canvasHeight" value="200"><br>
+    <label for="fontSize" title="Set the font size for the text">Font Size:</label>
+    <input type="number" id="fontSize" value="48"><br>
+    <label for="fontColor" title="Choose the font color">Font Color:</label>
+    <input type="color" id="fontColor" value="#000000"><br>
+    <label for="fontFile" title="Select a custom font file (.ttf or .otf)">Select a Font File:</label>
+    <input type="file" id="fontFile" accept=".ttf,.otf"><br>
+    <button onclick="generateImages()" title="Click to generate images from text">Generate Images</button><br>
+    <!--<button id="downloadAllConsent" title="Download all generated images">Download All Images</button>-->
+    <button id="removeAllImages" title="Remove all displayed images">Remove All Images</button>
+    <button id="toggleBorder" title="Toggle border on images">Toggle Border</button>
+</div>
 <div id="imagesContainer"></div>
 
 <script>
