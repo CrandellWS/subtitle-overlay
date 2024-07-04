@@ -4,42 +4,209 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Text to Image Generator</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        #imagesContainer img {
+            max-width: 100%;
+            height: auto;
+        }
+        .bordered {
+            border: 2px solid #000; /* Example: solid black border */
+        }
+    </style>
 </head>
 <body>
-    <textarea id="textInput" rows="10" cols="50" placeholder="Enter your text here..."></textarea><br>
-    <button onclick="generateImages()">Generate Images</button>
-    <div id="imagesContainer"></div>
+<div id="instructionsContainer" style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9;">
+    <h2>Welcome to the Text to Image Generator!</h2>
+    <p>This tool allows you to generate images from your text. Simply enter your text, adjust the settings below, and click "Generate Images".</p>
+    <p>You can also select a custom font file (.ttf or .otf) to personalize your images further.</p>
+</div>
+<textarea id="textInput" rows="10" cols="50" placeholder="Enter your text here..." title="Enter text to generate images"></textarea><br>
+<label for="canvasWidth" title="Set the width of the canvas">Canvas Width:</label>
+<input type="number" id="canvasWidth" value="1920"><br>
+<label for="canvasHeight" title="Set the height of the canvas">Canvas Height:</label>
+<input type="number" id="canvasHeight" value="200"><br>
+<label for="fontSize" title="Set the font size for the text">Font Size:</label>
+<input type="number" id="fontSize" value="48"><br>
+<label for="fontColor" title="Choose the font color">Font Color:</label>
+<input type="color" id="fontColor" value="#000000"><br>
+<label for="fontFile" title="Select a custom font file (.ttf or .otf)">Select a Font File:</label>
+<input type="file" id="fontFile" accept=".ttf,.otf"><br>
+<button onclick="generateImages()" title="Click to generate images from text">Generate Images</button><br>
+<!--<button id="downloadAllConsent" title="Download all generated images">Download All Images</button>-->
+<button id="removeAllImages" title="Remove all displayed images">Remove All Images</button>
+<button id="toggleBorder" title="Toggle border on images">Toggle Border</button>
+<div id="imagesContainer"></div>
 
-    <script>
-        function generateImages() {
-            const textInput = document.getElementById('textInput').value;
-            const lines = textInput.split('\n').filter(line => line.trim() !== '');
-            const imagesContainer = document.getElementById('imagesContainer');
-            imagesContainer.innerHTML = ''; // Clear previous images
+<script>
 
-            lines.forEach((line, index) => {
-                const canvas = document.createElement('canvas');
-                const context = canvas.getContext('2d');
-                context.font = '40px Arial';
-                const textWidth = context.measureText(line).width;
 
-                canvas.width = textWidth;
-                canvas.height = 50; // Adjust height based on your font size
+    // Event listener for the Toggle Border button
+    document.getElementById('toggleBorder').addEventListener('click', function() {
+        const images = document.querySelectorAll('#imagesContainer img');
+        images.forEach(img => {
+            img.classList.toggle('bordered');
+        });
+    });
 
-                // Create transparent background
-                context.clearRect(0, 0, canvas.width, canvas.height);
+    /**
+     * Generates images from input text, each line of text becomes a separate image.
+     * The images are displayed with a transparent background.
+     */
+    function generateImages() {
+        const textInput = document.getElementById('textInput').value;
+        const lines = textInput.split('\n').filter(line => line.trim() !== '');
+        const imagesContainer = document.getElementById('imagesContainer');
+        imagesContainer.innerHTML = '';
 
-                // Set text properties
-                context.font = '40px Arial';
-                context.fillStyle = 'black';
-                context.fillText(line, 0, 40); // Adjust Y position based on your font size
+        const canvasWidth = parseInt(document.getElementById('canvasWidth').value, 10);
+        const canvasHeight = parseInt(document.getElementById('canvasHeight').value, 10);
+        const fontSize = parseInt(document.getElementById('fontSize').value, 10);
+        const fontColor = document.getElementById('fontColor').value; // Get the selected font color
 
-                // Convert canvas to image and append to container
-                const img = document.createElement('img');
-                img.src = canvas.toDataURL();
-                imagesContainer.appendChild(img);
-            });
+        lines.forEach((line, index) => {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            if (window.customFontName) {
+                context.font = `${fontSize}px ${window.customFontName}`;
+            }
+            else {
+                context.font = `${fontSize}px Arial`;
+            }
+
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            context.fillStyle = fontColor; // Use the selected font color
+            console.log(fontColor);
+            const textX = canvas.width / 2;
+            const textY = canvas.height / 2;
+            context.fillText(line, textX, textY);
+
+            const img = document.createElement('img');
+            img.src = canvas.toDataURL('image/png');
+            imagesContainer.appendChild(img);
+
+            const sanitizedLine = line.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 15);
+            const downloadLink = document.createElement('a');
+            downloadLink.href = img.src;
+            downloadLink.download = `${sanitizedLine}.png`;
+            downloadLink.innerText = `Download Image: ${sanitizedLine}.png`;
+            imagesContainer.appendChild(downloadLink);
+
+            const removeButton = document.createElement('button');
+            removeButton.innerText = 'Remove';
+            removeButton.onclick = function() {
+                img.remove();
+                downloadLink.remove();
+                removeButton.remove();
+            };
+            imagesContainer.appendChild(removeButton);
+
+            // Create a Save As button for each image
+            const saveAsButton = document.createElement('button');
+            saveAsButton.innerText = 'Save As';
+            saveAsButton.onclick = function() {
+                const customName = prompt('Enter a filename:', `${sanitizedLine}.png`);
+                if (customName) {
+                    const link = document.createElement('a');
+                    link.href = img.src;
+                    link.download = customName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            };
+            imagesContainer.appendChild(saveAsButton);
+        });
+    }
+
+    document.getElementById('removeAllImages').addEventListener('click', function() {
+        document.getElementById('imagesContainer').innerHTML = '';
+    });
+
+    document.getElementById('fontFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) {
+            updateFontFamily('Arial');
+            return;
         }
-    </script>
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const fontFace = new FontFace('CustomFont', event.target.result);
+            fontFace.load().then(function(loadedFace) {
+                document.fonts.add(loadedFace);
+                // Update the font in the generateImages function or elsewhere as needed
+                // For example, set a global variable or directly modify the generateImages function to use 'CustomFont'
+                updateFontFamily('CustomFont');
+            }).catch(function(error) {
+                console.error('Font loading failed:', error);
+            });
+        };
+        reader.readAsArrayBuffer(file);
+    });
+
+    function updateFontFamily(fontName) {
+        // Example: Update the font used in the generateImages function
+        // This assumes generateImages or a similar function will use this variable for the font name
+        window.customFontName = fontName;
+    }
+
+
+
+    // //not implemented as generated code is not working.
+    //
+    // document.getElementById('downloadAllConsent').addEventListener('click', function() {
+    //     const userConsent = confirm('This feature requires loading a third-party library (JSZip). Do you agree to proceed?');
+    //     if (userConsent) {
+    //         loadJSZipLibrary().then(() => {
+    //             downloadAllImagesAsZip();
+    //         }).catch(error => {
+    //             console.error('Failed to load JSZip library:', error);
+    //         });
+    //     }
+    // });
+    //
+    // function loadJSZipLibrary() {
+    //     return new Promise((resolve, reject) => {
+    //         const script = document.createElement('script');
+    //         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js';
+    //         script.onload = () => resolve();
+    //         script.onerror = () => reject(new Error('JSZip library failed to load'));
+    //         document.head.appendChild(script);
+    //     });
+    // }
+    //
+    // function downloadAllImagesAsZip() {
+    //     const zip = new JSZip();
+    //     const images = document.querySelectorAll('#imagesContainer img');
+    //     let count = 0;
+    //
+    //     images.forEach((img, index) => {
+    //         const filename = `image${index + 1}.png`;
+    //         fetch(img.src)
+    //             .then(res => res.blob())
+    //             .then(blob => {
+    //                 zip.file(filename, blob);
+    //                 count++;
+    //                 if (count === images.length) {
+    //                     zip.generateAsync({type: 'blob'}).then(function(content) {
+    //                         saveAs(content, 'images.zip'); // Assumes FileSaver.js is also loaded or available
+    //                     });
+    //                 }
+    //             });
+    //     });
+    // }
+</script>
 </body>
 </html>
