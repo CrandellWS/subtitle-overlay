@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Image Generator</title>
+</head>
+<body>
+    <textarea id="textInput" rows="10" cols="50" placeholder="Enter your text here..."></textarea><br>
+    <button onclick="generateImages()">Generate Images</button>
+    <div id="imagesContainer"></div>
+
+    <script>
+        function generateImages() {
+            const textInput = document.getElementById('textInput').value;
+            const lines = textInput.split('\n').filter(line => line.trim() !== '');
+            const imagesContainer = document.getElementById('imagesContainer');
+            imagesContainer.innerHTML = ''; // Clear previous images
+
+            lines.forEach((line, index) => {
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                context.font = '40px Arial';
+                const textWidth = context.measureText(line).width;
+
+                canvas.width = textWidth;
+                canvas.height = 50; // Adjust height based on your font size
+
+                // Create transparent background
+                context.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Set text properties
+                context.font = '40px Arial';
+                context.fillStyle = 'black';
+                context.fillText(line, 0, 40); // Adjust Y position based on your font size
+
+                // Convert canvas to image and append to container
+                const img = document.createElement('img');
+                img.src = canvas.toDataURL();
+                imagesContainer.appendChild(img);
+            });
+        }
+    </script>
+</body>
+</html>
