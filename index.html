@@ -88,6 +88,10 @@
             const context = canvas.getContext('2d');
             canvas.width = canvasWidth;
             canvas.height = canvasHeight;
+
+            // Clear the canvas to ensure the background is transparent
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
             if (window.customFontName) {
                 context.font = `${fontSize}px ${window.customFontName}`;
             }
